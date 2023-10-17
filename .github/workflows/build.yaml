@@ -1,0 +1,21 @@
+##
+# This file is part of the IVMS Online.
+#
+# @copyright 2023 © by Rafał Wrzeszcz - Wrzasq.pl.
+##
+
+on:
+    push:
+        tags-ignore: "**"
+        branches:
+            - "master"
+    pull_request:
+        branches: "**"
+    schedule:
+        -
+            cron: "0 3 * * 0"
+
+jobs:
+    build:
+        uses: "ivms-online/.github/.github/workflows/rust-build.yaml@b95cc54f22f55f199427167821a96b5535a3bcac"
+        secrets: "inherit"
