@@ -1,0 +1,86 @@
+##
+# This file is part of the IVMS Online.
+#
+# @copyright 2023 © by Rafał Wrzeszcz - Wrzasq.pl.
+##
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+Transform:
+    - "WrzasqPlCformMacro"
+
+Parameters:
+    ProjectKey:
+        Type: "String"
+
+    ProjectVersion:
+        Type: "String"
+
+    ComponentId:
+        Type: "String"
+
+    GeneratorLambdaArn:
+        Type: "String"
+
+Resources:
+    IntegrationProjectRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            AssumeRolePolicyDocument:
+                -
+                    Action:
+                        - "sts:AssumeRole"
+                    Effect: "Allow"
+                    Principal:
+                        Service:
+                            - "codebuild.amazonaws.com"
+            ManagedPolicyArns:
+                - !ImportValue "root:v1:policy:cloudwatch-create-v2"
+                - !ImportValue "root:v1:codepipeline:artifacts-policy:arn"
+            Policies:
+                AllowLoggingToCloudWatchLogs:
+                    -
+                        Action:
+                            - "logs:CreateLogStream"
+                            - "logs:PutLogEvents"
+                        Effect: "Allow"
+                        Resource:
+                            - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*"
+                AllowInvokingLambdas:
+                    -
+                        Action:
+                            - "lambda:InvokeFunction"
+                        Effect: "Allow"
+                        Resource:
+                            - !Ref "GeneratorLambdaArn"
+                            -
+                                "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-inventory-service:CreatorLambda:Arn"
+                            -
+                                "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-inventory-service:DeleterLambda:Arn"
+                            -
+                                "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-licenses-service:CreatorLambda:Arn"
+                            -
+                                "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-licenses-service:DeleterLambda:Arn"
+
+    IntegrationBuildProject:
+        Type: "AWS::CodeBuild::Project"
+        Properties:
+            ServiceRole: !Ref "IntegrationProjectRole"
+            Environment:
+                Image: "rafalwrzeszczwrzasqpl/build-rust:nightly-v0.0.4"
+                ComputeType: "BUILD_GENERAL1_SMALL"
+                EnvironmentVariables:
+                    GENERATOR_LAMBDA: !Ref "GeneratorLambdaArn"
+                    INVENTORY_CREATOR_LAMBDA:
+                        "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-inventory-service:CreatorLambda:Arn"
+                    INVENTORY_DELETER_LAMBDA:
+                        "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-inventory-service:DeleterLambda:Arn"
+                    LICENSES_CREATOR_LAMBDA:
+                        "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-licenses-service:CreatorLambda:Arn"
+                    LICENSES_DELETER_LAMBDA:
+                        "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-licenses-service:DeleterLambda:Arn"
+            Cache: !Sub "${Import:root:v1:codebuild:cache-bucket:name}/${ComponentId}/integrations"
+
+Outputs:
+    BuildProjectName:
+        Value: !Ref "IntegrationBuildProject"

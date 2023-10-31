@@ -1,0 +1,54 @@
+##
+# This file is part of the IVMS Online.
+#
+# @copyright 2023 © by Rafał Wrzeszcz - Wrzasq.pl.
+##
+
+[package]
+name = "ivms-salt-extractor"
+version = "0.0.1"
+edition = "2021"
+repository = "https://github.com/ivms-online/ivms-salt-extractor"
+authors = [
+    "Rafał Wrzeszcz <rafal.wrzeszcz@wrzasq.pl>"
+]
+
+[dependencies]
+aws-config = "0.56.1"
+aws-sdk-lambda = "0.33.0"
+aws-smithy-http = "0.56.1"
+aws-smithy-types = "0.56.1"
+chrono = { version = "0.4.31", default-features = false, features = ["clock", "serde"] }
+futures = "0.3.28"
+hmac = "0.12.1"
+http = "0.2.9"
+jwt = "0.16.0"
+lambda_runtime = "0.8.2"
+log = "0.4.20"
+serde = { version = "1.0.189", features = ["derive"] }
+serde_json = "1.0.107"
+sha2 = "0.10.8"
+thiserror = "1.0.49"
+tokio = { version = "1.33.0", features = ["macros"] }
+uuid = { version = "1.4.1", features = ["serde", "v4"] }
+wrzasqpl-commons-aws = "3.2.9"
+
+[dev-dependencies]
+async-trait = "0.1.73"
+aws-sdk-lambda = "0.33.0"
+cucumber = "0.20.0"
+test-context = "0.1.4"
+
+[[test]]
+name = "integration"
+path = "tests/main.rs"
+harness = false
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true
+panic = "abort"

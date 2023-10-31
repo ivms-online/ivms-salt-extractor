@@ -1,0 +1,59 @@
+##
+# This file is part of the IVMS Online.
+#
+# @copyright 2023 © by Rafał Wrzeszcz - Wrzasq.pl.
+##
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+Transform:
+    - "WrzasqPlCformMacro"
+    - "AWS::Serverless-2016-10-31"
+
+Parameters:
+    ProjectKey:
+        Type: "String"
+
+    ProjectVersion:
+        Type: "String"
+
+    ReleaseVersion:
+        Type: "String"
+
+Resources:
+    Generator:
+        Type: "AWS::Serverless::Function"
+        Properties:
+            Runtime: "provided.al2"
+            CodeUri:
+                Bucket: "chilldev-repository"
+                Key: !Sub "sam/ivms-online/ivms-salt-extractor/${ReleaseVersion}/ivms-salt-extractor.zip"
+            Handler: "extractor:generate"
+            MemorySize: 512
+            Environment:
+                Variables:
+                    RUST_LOG: "info"
+                    INVENTORY_LISTER:
+                        "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-inventory-service:ListerLambda:Arn"
+                    LICENSES_LISTER:
+                        "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-licenses-service:ListerLambda:Arn"
+            Timeout: 30
+            Tracing: "Active"
+            Policies:
+                -
+                    Version: "2012-10-17"
+                    Statement:
+                        -
+                            Actions:
+                                - "lambda:InvokeFunction"
+                            Effect: "Allow"
+                            Resource:
+                                -
+                                    "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-inventory-service:ListerLambda:Arn"
+                                -
+                                    "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-licenses-service:ListerLambda:Arn"
+            LogsRetentionInDays: 14
+
+Outputs:
+    LambdaArn:
+        Value: !GetAtt "Generator.Arn"
