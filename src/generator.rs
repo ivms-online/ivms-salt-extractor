@@ -5,8 +5,8 @@
  */
 
 use crate::api::{
-    GeneratorRequest, InventoryFetchResponse, InventoryListRequest, InventoryListResponse, LicenseFetchResponse,
-    LicensesListRequest, LicensesListResponse,
+    GeneratorRequest, InventoryFetchRequest, InventoryFetchResponse, LicenseFetchResponse, LicensesListRequest,
+    LicensesListResponse,
 };
 use crate::model::Claims;
 use crate::runtime_error::RuntimeError;
@@ -19,41 +19,34 @@ use serde_json::{from_slice, to_string};
 use sha2::Sha512;
 use uuid::Uuid;
 
-pub async fn load_inventory(
+const JWT_INVENTORY_TYPE: &str = "jwt_key";
+
+pub async fn load_key(
     client: &Client,
     lambda: &String,
     customer_id: &Uuid,
     vessel_id: &Uuid,
-) -> Result<Vec<InventoryFetchResponse>, RuntimeError> {
-    let mut request = InventoryListRequest {
-        customer_id: *customer_id,
-        vessel_id: *vessel_id,
-        page_token: None,
-    };
-    let mut inventory = vec![];
+    inventory_key: String,
+) -> Result<String, RuntimeError> {
+    if let Some(result) = client
+        .invoke()
+        .function_name(lambda)
+        .payload(Blob::new(to_string(&InventoryFetchRequest {
+            customer_id: *customer_id,
+            vessel_id: *vessel_id,
+            inventory_type: JWT_INVENTORY_TYPE.into(),
+            inventory_id: inventory_key,
+        })?))
+        .send()
+        .await?
+        .payload()
+    {
+        let response = from_slice::<InventoryFetchResponse>(result.as_ref())?;
 
-    loop {
-        if let Some(result) = client
-            .invoke()
-            .function_name(lambda)
-            .payload(Blob::new(to_string(&request)?))
-            .send()
-            .await?
-            .payload()
-        {
-            let response = from_slice::<InventoryListResponse>(result.as_ref())?;
-
-            request.page_token = response.page_token;
-
-            inventory.extend(response.inventory);
-        }
-
-        if request.page_token.is_none() {
-            break;
-        }
+        response.serial_number.ok_or(RuntimeError::MissingKey)
+    } else {
+        Err(RuntimeError::MissingKey)
     }
-
-    Ok(inventory)
 }
 
 pub async fn load_licenses(
@@ -93,18 +86,13 @@ pub async fn load_licenses(
     Ok(licenses)
 }
 
-fn generate_key(_: Vec<InventoryFetchResponse>) -> String {
-    // TODO: define list of keys required for JWT key
-    String::from("<TODO>")
-}
-
 pub fn assemble_token(
     request: GeneratorRequest,
-    inventory: Vec<InventoryFetchResponse>,
+    key: String,
     licenses: Vec<LicenseFetchResponse>,
 ) -> Result<String, RuntimeError> {
     // key used for generating signature based on known hardware descriptors
-    let key: Hmac<Sha512> = Hmac::new_from_slice(generate_key(inventory).as_bytes())?;
+    let key: Hmac<Sha512> = Hmac::new_from_slice(key.as_bytes())?;
 
     // generate list of claims
     let claims = Claims::from_input(

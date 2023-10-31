@@ -27,7 +27,7 @@ pub struct Claims {
     #[serde(rename = "aud")]
     pub audience: String,
     #[serde(rename = "exp")]
-    pub expire_at: i64,
+    pub expires_at: i64,
     #[serde(rename = "iat")]
     pub issued_at: i64,
     #[serde(rename = "ivms:licenses")]
@@ -59,7 +59,7 @@ impl Claims {
             user: format!("{customer_id}:{vessel_id}"),
             audience,
             // two years
-            expire_at: (Utc::now() + Duration::days(730)).timestamp(),
+            expires_at: (Utc::now() + Duration::days(730)).timestamp(),
             issued_at: Utc::now().timestamp(),
             licenses: claims,
         }
@@ -120,7 +120,7 @@ mod tests {
         assert_eq!(ISSUER, claims.issuer);
         assert_eq!(format!("{CUSTOMER_ID}:{VESSEL_ID}"), claims.user);
         assert_eq!(AUDIENCE, claims.audience);
-        assert!(claims.expire_at >= after.timestamp());
+        assert!(claims.expires_at >= after.timestamp());
         assert!(claims.issued_at >= before.timestamp());
         assert!(claims.issued_at <= after.timestamp());
         assert_eq!(3, claims.licenses.len());

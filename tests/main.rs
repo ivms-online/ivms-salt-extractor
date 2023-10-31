@@ -21,9 +21,6 @@ use std::env::{var, VarError};
 use std::future::join;
 use tokio::main as tokio_main;
 
-// TODO: temporary fixed key
-const TEMP_KEY: &str = "<TODO>";
-
 macro_rules! serialize_blob {
     ($($data:tt)+) => {
         Blob::new(
@@ -45,6 +42,7 @@ struct TestWorld {
     // test run scope
     cleanup_inventories: Vec<(String, String, String, String)>,
     cleanup_licenses: Vec<(String, String, String)>,
+    response_token: Option<String>,
     token_claims: Option<Claims>,
 }
 
@@ -61,6 +59,7 @@ impl TestWorld {
             lambda: LambdaClient::new(config),
             cleanup_inventories: vec![],
             cleanup_licenses: vec![],
+            response_token: None,
             token_claims: None,
         })
     }
@@ -219,7 +218,7 @@ async fn there_is_a_license(
 // When …
 
 #[when(
-    expr = "I request JWT token for vessel {string} of customer {string} with {string} issuer for {string} audience"
+    expr = "I request JWT token for vessel {string} of customer {string} with {string} issuer for {string} audience with {string} specified as verification key"
 )]
 async fn i_request_jwt_token(
     world: &mut TestWorld,
@@ -227,10 +226,9 @@ async fn i_request_jwt_token(
     customer_id: String,
     issuer: String,
     audience: String,
+    inventory_key: String,
 ) {
-    let key: Hmac<Sha512> = Hmac::new_from_slice(TEMP_KEY.as_bytes()).unwrap();
-
-    world.token_claims = from_slice::<HashMap<String, String>>(
+    world.response_token = from_slice::<HashMap<String, String>>(
         world
             .lambda
             .invoke()
@@ -238,6 +236,7 @@ async fn i_request_jwt_token(
             .payload(serialize_blob!({
                 "customerId": customer_id,
                 "vesselId": vessel_id,
+                "inventoryKey": inventory_key,
                 "issuer": issuer,
                 "audience": audience,
             }))
@@ -251,11 +250,20 @@ async fn i_request_jwt_token(
     )
     .ok()
     .as_ref()
-    .and_then(|response| response.get("token"))
-    .and_then(|token| token.verify_with_key(&key).ok());
+    .and_then(|response| response.get("token"));
 }
 
 // Then …
+
+#[then(expr = "I can verify JWT claims with key {string}")]
+async fn i_can_verify_jwt_claims_with_key(world: &mut TestWorld, key: String) {
+    let key: Hmac<Sha512> = Hmac::new_from_slice(key.as_bytes()).unwrap();
+
+    world.token_claims = world
+        .response_token
+        .as_ref()
+        .and_then(|token| token.verify_with_key(&key).ok());
+}
 
 #[then(expr = "I have JWT token with {string} issuer claim")]
 async fn i_have_jwt_with_issuer(world: &mut TestWorld, issuer: String) {

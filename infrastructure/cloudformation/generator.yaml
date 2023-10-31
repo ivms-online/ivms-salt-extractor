@@ -33,8 +33,8 @@ Resources:
             Environment:
                 Variables:
                     RUST_LOG: "info"
-                    INVENTORY_LISTER:
-                        "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-inventory-service:ListerLambda:Arn"
+                    INVENTORY_FETCHER:
+                        "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-inventory-service:FetcherLambda:Arn"
                     LICENSES_LISTER:
                         "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-licenses-service:ListerLambda:Arn"
             Timeout: 30
@@ -49,7 +49,7 @@ Resources:
                             Effect: "Allow"
                             Resource:
                                 -
-                                    "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-inventory-service:ListerLambda:Arn"
+                                    "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-inventory-service:FetcherLambda:Arn"
                                 -
                                     "Fn::ImportValue": !Sub "${ProjectKey}:${ProjectVersion}:ivms-licenses-service:ListerLambda:Arn"
             LogsRetentionInDays: 14

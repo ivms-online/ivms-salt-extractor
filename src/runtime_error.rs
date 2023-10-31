@@ -20,6 +20,7 @@ use uuid::Error as UuidError;
 pub enum RuntimeError {
     ClientConfigLoadingError(VarError),
     LambdaInvokeError(#[from] SdkError<InvokeError, Response<SdkBody>>),
+    MissingKey,
     InvalidKey(#[from] InvalidLength),
     JwtError(#[from] JwtError),
     SerializationError(#[from] SerializationError),

@@ -17,6 +17,7 @@ use uuid::Uuid;
 pub struct GeneratorRequest {
     pub customer_id: Uuid,
     pub vessel_id: Uuid,
+    pub inventory_key: String,
     pub issuer: String,
     pub audience: String,
 }
@@ -37,10 +38,11 @@ impl GeneratorResponse {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct InventoryListRequest {
+pub struct InventoryFetchRequest {
     pub customer_id: Uuid,
     pub vessel_id: Uuid,
-    pub page_token: Option<String>,
+    pub inventory_type: String,
+    pub inventory_id: String,
 }
 
 #[derive(Deserialize)]
@@ -51,13 +53,6 @@ pub struct InventoryFetchResponse {
     pub serial_number: Option<String>,
     pub aws_instance_id: Option<String>,
     pub created_at: DateTime<FixedOffset>,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct InventoryListResponse {
-    pub inventory: Vec<InventoryFetchResponse>,
-    pub page_token: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -108,6 +103,7 @@ mod tests {
     const CUSTOMER_ID: Uuid = uuid!("00000000-0000-0000-0000-000000000000");
     const VESSEL_ID: Uuid = uuid!("00000000-0000-0000-0000-000000000001");
     const TOKEN: &str = "test0";
+    const INVENTORY_KEY: &str = "local";
     const ISSUER: &str = "unit-test";
     const AUDIENCE: &str = "local";
 
@@ -133,7 +129,7 @@ mod tests {
 
     #[test]
     fn deserialize_trigger_request() {
-        let input = format!("{{\"customerId\":\"{CUSTOMER_ID}\",\"vesselId\":\"{VESSEL_ID}\",\"issuer\":\"{ISSUER}\",\"audience\":\"{AUDIENCE}\"}}");
+        let input = format!("{{\"customerId\":\"{CUSTOMER_ID}\",\"vesselId\":\"{VESSEL_ID}\",\"inventoryKey\":\"{INVENTORY_KEY}\",\"issuer\":\"{ISSUER}\",\"audience\":\"{AUDIENCE}\"}}");
         let request: GeneratorRequest = from_str(&input).unwrap();
 
         assert_eq!(CUSTOMER_ID, request.customer_id);

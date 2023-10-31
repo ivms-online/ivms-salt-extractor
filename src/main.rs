@@ -14,7 +14,7 @@ mod model;
 mod runtime_error;
 
 use crate::api::{ApiError, GeneratorRequest, GeneratorResponse};
-use crate::generator::{assemble_token, load_inventory, load_licenses};
+use crate::generator::{assemble_token, load_key, load_licenses};
 use crate::runtime_error::RuntimeError;
 use aws_config::load_from_env;
 use aws_sdk_lambda::Client as LambdaClient;
@@ -27,12 +27,12 @@ use wrzasqpl_commons_aws::{run_lambda, LambdaError};
 
 fn generate_license_file(
     lambda: Rc<LambdaClient>,
-    inventory_lister: Rc<String>,
+    inventory_fetcher: Rc<String>,
     licenses_lister: Rc<String>,
 ) -> impl Fn<(LambdaEvent<GeneratorRequest>,), Output = impl Future<Output = Result<GeneratorResponse, ApiError>>> {
     move |event: LambdaEvent<GeneratorRequest>| {
         let lambda = lambda.clone();
-        let inventory_lister = inventory_lister.clone();
+        let inventory_fetcher = inventory_fetcher.clone();
         let licenses_lister = licenses_lister.clone();
 
         async move {
@@ -40,7 +40,13 @@ fn generate_license_file(
             let vessel_id = event.payload.vessel_id;
 
             let (inventory, licenses) = join!(
-                load_inventory(lambda.as_ref(), inventory_lister.as_ref(), &customer_id, &vessel_id),
+                load_key(
+                    lambda.as_ref(),
+                    inventory_fetcher.as_ref(),
+                    &customer_id,
+                    &vessel_id,
+                    event.payload.inventory_key.clone()
+                ),
                 load_licenses(lambda.as_ref(), licenses_lister.as_ref(), &customer_id, &vessel_id)
             )
             .await;
@@ -59,7 +65,7 @@ async fn main() -> Result<(), Error> {
     run_lambda!(
         "extractor:generate": generate_license_file(
             Rc::new(LambdaClient::new(config)),
-            Rc::new(var("INVENTORY_LISTER").map_err(RuntimeError::ClientConfigLoadingError)?),
+            Rc::new(var("INVENTORY_FETCHER").map_err(RuntimeError::ClientConfigLoadingError)?),
             Rc::new(var("LICENSES_LISTER").map_err(RuntimeError::ClientConfigLoadingError)?),
         ),
     )
