@@ -174,10 +174,10 @@ async fn there_is_an_inventory(
         .invoke()
         .function_name(world.inventory_creator_lambda.as_str())
         .payload(serialize_blob!({
-            "customer_id": customer_id,
-            "vessel_id": vessel_id,
-            "inventory_type": inventory_type,
-            "inventory_id": inventory_id,
+            "customerId": customer_id,
+            "vesselId": vessel_id,
+            "inventoryType": inventory_type,
+            "inventoryId": inventory_id,
             "serial_number": serial_number,
         }))
         .send()
@@ -205,11 +205,11 @@ async fn there_is_a_license(
         .invoke()
         .function_name(world.license_creator_lambda.as_str())
         .payload(serialize_blob!({
-            "customer_id": customer_id,
-            "vessel_id": vessel_id,
-            "license_key": license_key,
+            "customerId": customer_id,
+            "vesselId": vessel_id,
+            "licenseKey": license_key,
             "count": count,
-            "expires_at": expires_at,
+            "expiresAt": expires_at,
         }))
         .send()
         .await
@@ -223,8 +223,8 @@ async fn there_is_a_license(
 )]
 async fn i_request_jwt_token(
     world: &mut TestWorld,
-    customer_id: String,
     vessel_id: String,
+    customer_id: String,
     issuer: String,
     audience: String,
 ) {

@@ -44,7 +44,7 @@ Resources:
                     Version: "2012-10-17"
                     Statement:
                         -
-                            Actions:
+                            Action:
                                 - "lambda:InvokeFunction"
                             Effect: "Allow"
                             Resource:

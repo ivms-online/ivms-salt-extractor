@@ -27,9 +27,9 @@ pub struct Claims {
     #[serde(rename = "aud")]
     pub audience: String,
     #[serde(rename = "exp")]
-    pub expire_at: DateTime<FixedOffset>,
+    pub expire_at: i64,
     #[serde(rename = "iat")]
-    pub issued_at: DateTime<FixedOffset>,
+    pub issued_at: i64,
     #[serde(rename = "ivms:licenses")]
     pub licenses: HashMap<String, LicenseClaim>,
 }
@@ -59,8 +59,8 @@ impl Claims {
             user: format!("{customer_id}:{vessel_id}"),
             audience,
             // two years
-            expire_at: Utc::now().fixed_offset() + Duration::days(730),
-            issued_at: Utc::now().fixed_offset(),
+            expire_at: (Utc::now() + Duration::days(730)).timestamp(),
+            issued_at: Utc::now().timestamp(),
             licenses: claims,
         }
     }
@@ -120,9 +120,9 @@ mod tests {
         assert_eq!(ISSUER, claims.issuer);
         assert_eq!(format!("{CUSTOMER_ID}:{VESSEL_ID}"), claims.user);
         assert_eq!(AUDIENCE, claims.audience);
-        assert!(claims.expire_at > after);
-        assert!(claims.issued_at > before);
-        assert!(claims.issued_at < after);
+        assert!(claims.expire_at >= after.timestamp());
+        assert!(claims.issued_at >= before.timestamp());
+        assert!(claims.issued_at <= after.timestamp());
         assert_eq!(3, claims.licenses.len());
 
         let entry0 = claims.licenses.get(LICENSE_KEY_0);
