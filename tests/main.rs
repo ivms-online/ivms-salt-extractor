@@ -177,7 +177,7 @@ async fn there_is_an_inventory(
             "vesselId": vessel_id,
             "inventoryType": inventory_type,
             "inventoryId": inventory_id,
-            "serial_number": serial_number,
+            "serialNumber": serial_number,
         }))
         .send()
         .await
@@ -250,7 +250,8 @@ async fn i_request_jwt_token(
     )
     .ok()
     .as_ref()
-    .and_then(|response| response.get("token"));
+    .and_then(|response| response.get("token"))
+    .cloned();
 }
 
 // Then …
