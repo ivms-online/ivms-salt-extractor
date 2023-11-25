@@ -24,7 +24,7 @@ Resources:
     Generator:
         Type: "AWS::Serverless::Function"
         Properties:
-            Runtime: "provided.al2"
+            Runtime: "provided.al2023"
             CodeUri:
                 Bucket: "chilldev-repository"
                 Key: !Sub "sam/ivms-online/ivms-salt-extractor/${ReleaseVersion}/ivms-salt-extractor.zip"

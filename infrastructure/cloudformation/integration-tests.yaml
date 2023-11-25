@@ -67,7 +67,7 @@ Resources:
         Properties:
             ServiceRole: !Ref "IntegrationProjectRole"
             Environment:
-                Image: "rafalwrzeszczwrzasqpl/build-rust:nightly-v0.0.4"
+                Image: "rafalwrzeszczwrzasqpl/build-rust:nightly-v0.1.0"
                 ComputeType: "BUILD_GENERAL1_SMALL"
                 EnvironmentVariables:
                     GENERATOR_LAMBDA: !Ref "GeneratorLambdaArn"

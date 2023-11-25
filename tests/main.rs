@@ -6,8 +6,9 @@
 
 #![feature(async_closure, future_join)]
 
-use aws_config::load_from_env;
+use aws_config::load_defaults;
 use aws_sdk_lambda::Client as LambdaClient;
+use aws_smithy_runtime_api::client::behavior_version::BehaviorVersion;
 use aws_smithy_types::Blob;
 use cucumber::{given, then, when, World};
 use futures::future::join_all;
@@ -48,7 +49,7 @@ struct TestWorld {
 
 impl TestWorld {
     async fn new() -> Result<Self, VarError> {
-        let config = &load_from_env().await;
+        let config = &load_defaults(BehaviorVersion::v2023_11_09()).await;
 
         Ok(Self {
             generator_lambda: var("GENERATOR_LAMBDA")?,

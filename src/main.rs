@@ -16,8 +16,9 @@ mod runtime_error;
 use crate::api::{ApiError, GeneratorRequest, GeneratorResponse};
 use crate::generator::{assemble_token, load_key, load_licenses};
 use crate::runtime_error::RuntimeError;
-use aws_config::load_from_env;
+use aws_config::load_defaults;
 use aws_sdk_lambda::Client as LambdaClient;
+use aws_smithy_runtime_api::client::behavior_version::BehaviorVersion;
 use lambda_runtime::{Error, LambdaEvent};
 use std::env::var;
 use std::future::{join, Future};
@@ -60,7 +61,7 @@ fn generate_license_file(
 
 #[tokio_main]
 async fn main() -> Result<(), Error> {
-    let config = &load_from_env().await;
+    let config = &load_defaults(BehaviorVersion::v2023_11_09()).await;
 
     run_lambda!(
         "extractor:generate": generate_license_file(

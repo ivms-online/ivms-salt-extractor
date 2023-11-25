@@ -12,12 +12,12 @@ clean:
 	cargo clean
 
 build:
-	cargo build --release --target x86_64-unknown-linux-musl
+	cargo build --release --target x86_64-unknown-linux-gnu
 
 build-dev:
-	cargo build --target x86_64-unknown-linux-musl
+	cargo build --target x86_64-unknown-linux-gnu
 
-package: $(shell find target/x86_64-unknown-linux-musl/release/ -maxdepth 1 -executable -type f | sed s@x86_64-unknown-linux-musl/release/\\\(.*\\\)\${$}@\\1.zip@)
+package: $(shell find target/x86_64-unknown-linux-gnu/release/ -maxdepth 1 -executable -type f | sed s@x86_64-unknown-linux-gnu/release/\\\(.*\\\)\${$}@\\1.zip@)
 
 test:
 	cargo tarpaulin --all-features --out Xml --bins
@@ -42,7 +42,7 @@ doc:
 	cargo doc --no-deps
 
 # generic targets
-target/%.zip: target/x86_64-unknown-linux-musl/release/%
+target/%.zip: target/x86_64-unknown-linux-gnu/release/%
 	upx --best $<
 	zip -j $@ $^
 	printf "@ $(<F)\n@=bootstrap\n" | zipnote -w $@
