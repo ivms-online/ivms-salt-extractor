@@ -16,7 +16,7 @@ authors = [
 [dependencies]
 aws-config = "1.0.1"
 aws-sdk-lambda = "0.39.0"
-aws-smithy-runtime-api = "1.0.1"
+aws-smithy-runtime-api = "1.0.2"
 aws-smithy-types = "1.0.1"
 chrono = { version = "0.4.31", default-features = false, features = ["clock", "serde"] }
 futures = "0.3.29"
