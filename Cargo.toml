@@ -14,7 +14,7 @@ authors = [
 ]
 
 [dependencies]
-aws-config = "1.0.1"
+aws-config = "1.1.0"
 aws-sdk-lambda = "1.3.0"
 aws-smithy-runtime-api = "1.0.2"
 aws-smithy-types = "1.0.2"
