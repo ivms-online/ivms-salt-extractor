@@ -33,7 +33,7 @@ uuid = { version = "1.6.1", features = ["serde", "v4"] }
 wrzasqpl-commons-aws = "3.4.2"
 
 [dev-dependencies]
-async-trait = "0.1.74"
+async-trait = "0.1.77"
 aws-sdk-lambda = "1.7.0"
 cucumber = "0.20.2"
 test-context = "0.1.4"
