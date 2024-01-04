@@ -1,7 +1,7 @@
 ##
 # This file is part of the IVMS Online.
 #
-# @copyright 2023 © by Rafał Wrzeszcz - Wrzasq.pl.
+# @copyright 2023 - 2024 © by Rafał Wrzeszcz - Wrzasq.pl.
 ##
 
 [package]
@@ -15,26 +15,26 @@ authors = [
 
 [dependencies]
 aws-config = "1.1.1"
-aws-sdk-lambda = "1.7.0"
+aws-sdk-lambda = "1.9.0"
 aws-smithy-runtime-api = "1.1.1"
 aws-smithy-types = "1.1.1"
 chrono = { version = "0.4.31", default-features = false, features = ["clock", "serde"] }
-futures = "0.3.29"
+futures = "0.3.30"
 hmac = "0.12.1"
 jwt = "0.16.0"
-lambda_runtime = "0.8.3"
+lambda_runtime = "0.9.0"
 log = "0.4.20"
-serde = { version = "1.0.193", features = ["derive"] }
-serde_json = "1.0.108"
+serde = { version = "1.0.194", features = ["derive"] }
+serde_json = "1.0.111"
 sha2 = "0.10.8"
-thiserror = "1.0.50"
-tokio = { version = "1.35.0", features = ["macros"] }
+thiserror = "1.0.56"
+tokio = { version = "1.35.1", features = ["macros"] }
 uuid = { version = "1.6.1", features = ["serde", "v4"] }
-wrzasqpl-commons-aws = "3.4.2"
+wrzasqpl-commons-aws = "3.4.4"
 
 [dev-dependencies]
-async-trait = "0.1.74"
-aws-sdk-lambda = "1.7.0"
+async-trait = "0.1.77"
+aws-sdk-lambda = "1.9.0"
 cucumber = "0.20.2"
 test-context = "0.1.4"
 

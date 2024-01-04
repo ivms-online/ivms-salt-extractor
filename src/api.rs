@@ -1,7 +1,7 @@
 /*
  * This file is part of the IVMS Online.
  *
- * @copyright 2023 © by Rafał Wrzeszcz - Wrzasq.pl.
+ * @copyright 2023 - 2024 © by Rafał Wrzeszcz - Wrzasq.pl.
  */
 
 use crate::runtime_error::RuntimeError;
@@ -111,9 +111,6 @@ mod tests {
     fn runtime_api_error() {
         match ApiError::from(RuntimeError::ClientConfigLoadingError(VarError::NotPresent)) {
             ApiError::RuntimeError(_) => {}
-            _ => {
-                panic!("Invalid error type.");
-            }
         }
     }
 

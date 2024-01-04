@@ -1,7 +1,7 @@
 ##
 # This file is part of the IVMS Online.
 #
-# @copyright 2023 © by Rafał Wrzeszcz - Wrzasq.pl.
+# @copyright 2023 - 2024 © by Rafał Wrzeszcz - Wrzasq.pl.
 ##
 
 on:
@@ -17,5 +17,5 @@ on:
 
 jobs:
     build:
-        uses: "ivms-online/.github/.github/workflows/rust-build.yaml@0e2dc3532a94d72b0f886a4f16a4cb3a2371c3ce"
+        uses: "ivms-online/.github/.github/workflows/rust-build.yaml@ec184384a38663e2cd52aebb01f1886c6399bb7a"
         secrets: "inherit"

@@ -1,7 +1,7 @@
 ##
 # This file is part of the IVMS Online.
 #
-# @copyright 2023 © by Rafał Wrzeszcz - Wrzasq.pl.
+# @copyright 2023 - 2024 © by Rafał Wrzeszcz - Wrzasq.pl.
 ##
 
 # IntelliJ IDE files
@@ -12,5 +12,8 @@
 /build-info.json
 /**/target
 /cobertura.xml
+/coverage.lcov
+*.profraw
+
 # log files
 /**/*.log

@@ -1,7 +1,7 @@
 ##
 # This file is part of the IVMS Online.
 #
-# @copyright 2023 © by Rafał Wrzeszcz - Wrzasq.pl.
+# @copyright 2023 - 2024 © by Rafał Wrzeszcz - Wrzasq.pl.
 ##
 
 SHELL:=bash
@@ -10,6 +10,8 @@ default: build
 
 clean:
 	cargo clean
+	find . -name "*.profraw" -exec rm {} \;
+	rm -rf coverage.lcov
 
 build:
 	cargo build --release --target x86_64-unknown-linux-gnu
@@ -20,10 +22,13 @@ build-dev:
 package: $(shell find target/x86_64-unknown-linux-gnu/release/ -maxdepth 1 -executable -type f | sed s@x86_64-unknown-linux-gnu/release/\\\(.*\\\)\${$}@\\1.zip@)
 
 test:
-	cargo tarpaulin --all-features --out Xml --bins
+	CARGO_INCREMENTAL=0 \
+	RUSTFLAGS="-Cinstrument-coverage" \
+	LLVM_PROFILE_FILE="cargo-test-%p-%m.profraw" \
+	cargo test --all-features --bins
 
 test-local:
-	docker run -d --rm --name dynamodb -p 8000:8000 amazon/dynamodb-local:2.0.0
+	docker run -d --rm --name dynamodb -p 8000:8000 amazon/dynamodb-local:2.2.1
 	make test
 	docker stop dynamodb
 
@@ -31,7 +36,7 @@ test-integration:
 	cargo test --test "*"
 
 check:
-	cargo fmt --check -- --config max_width=120,newline_style=Unix,edition=2021
+	cargo fmt --check
 	cargo clippy
 	cargo udeps
 
@@ -40,6 +45,31 @@ check-local:
 
 doc:
 	cargo doc --no-deps
+
+fix:
+	cargo fmt
+
+lcov:
+	grcov . \
+		--binary-path ./target/debug/deps/ \
+		-s . \
+		-t lcov \
+		--branch \
+		--ignore-not-existing \
+		--ignore "../*" \
+		--ignore "/*" \
+		-o coverage.lcov
+
+coverage:
+	grcov . \
+		--binary-path ./target/debug/deps/ \
+		-s . \
+		-t html \
+		--branch \
+		--ignore-not-existing \
+		--ignore "../*" \
+		--ignore "/*" \
+		-o target/coverage
 
 # generic targets
 target/%.zip: target/x86_64-unknown-linux-gnu/release/%

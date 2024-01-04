@@ -1,7 +1,7 @@
 ##
 # This file is part of the IVMS Online.
 #
-# @copyright 2023 © by Rafał Wrzeszcz - Wrzasq.pl.
+# @copyright 2023 - 2024 © by Rafał Wrzeszcz - Wrzasq.pl.
 ##
 
 AWSTemplateFormatVersion: "2010-09-09"
@@ -67,8 +67,8 @@ Resources:
         Properties:
             ServiceRole: !Ref "IntegrationProjectRole"
             Environment:
-                Image: "rafalwrzeszczwrzasqpl/build-rust:nightly-v0.1.0"
-                ComputeType: "BUILD_GENERAL1_SMALL"
+                Image: "rafalwrzeszczwrzasqpl/build-rust:nightly-v0.2.0"
+                ComputeType: "BUILD_GENERAL1_MEDIUM"
                 EnvironmentVariables:
                     GENERATOR_LAMBDA: !Ref "GeneratorLambdaArn"
                     INVENTORY_CREATOR_LAMBDA:
