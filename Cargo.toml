@@ -15,7 +15,7 @@ authors = [
 
 [dependencies]
 aws-config = "1.1.1"
-aws-sdk-lambda = "1.9.0"
+aws-sdk-lambda = "1.12.0"
 aws-smithy-runtime-api = "1.1.1"
 aws-smithy-types = "1.1.1"
 chrono = { version = "0.4.31", default-features = false, features = ["clock", "serde"] }
@@ -34,7 +34,7 @@ wrzasqpl-commons-aws = "3.4.4"
 
 [dev-dependencies]
 async-trait = "0.1.77"
-aws-sdk-lambda = "1.9.0"
+aws-sdk-lambda = "1.12.0"
 cucumber = "0.20.2"
 test-context = "0.1.4"
 
