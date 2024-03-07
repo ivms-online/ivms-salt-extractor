@@ -1,7 +1,7 @@
 /*
  * This file is part of the IVMS Online.
  *
- * @copyright 2023 © by Rafał Wrzeszcz - Wrzasq.pl.
+ * @copyright 2023 - 2024 © by Rafał Wrzeszcz - Wrzasq.pl.
  */
 
 #![feature(async_closure, future_join)]
@@ -120,7 +120,7 @@ async fn main() {
         .after(|_feature, _rule, _scenario, _finished, world| {
             Box::pin(async move {
                 if let Some(&mut ref cleanup) = world {
-                    let inventory_tasks = cleanup.cleanup_inventories.iter().map(async move |key| {
+                    let inventory_tasks = cleanup.cleanup_inventories.iter().map(|key| async {
                         delete_inventory(
                             &cleanup,
                             &Some(key.0.clone()),
@@ -131,7 +131,7 @@ async fn main() {
                         .await
                     });
 
-                    let license_tasks = cleanup.cleanup_licenses.iter().map(async move |key| {
+                    let license_tasks = cleanup.cleanup_licenses.iter().map(|key| async {
                         delete_license(
                             &cleanup,
                             &Some(key.0.clone()),
