@@ -1,7 +1,7 @@
 /*
  * This file is part of the IVMS Online.
  *
- * @copyright 2023 © by Rafał Wrzeszcz - Wrzasq.pl.
+ * @copyright 2023 - 2024 © by Rafał Wrzeszcz - Wrzasq.pl.
  */
 
 use crate::api::LicenseFetchResponse;
@@ -9,6 +9,8 @@ use chrono::{DateTime, Duration, FixedOffset, Utc};
 use serde::Serialize;
 use std::collections::HashMap;
 use uuid::Uuid;
+
+const MICROS_PER_TWO_YEARS: i64 = 62_208_000_000_000;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -59,7 +61,7 @@ impl Claims {
             user: format!("{customer_id}:{vessel_id}"),
             audience,
             // two years
-            expires_at: (Utc::now() + Duration::days(730)).timestamp(),
+            expires_at: (Utc::now() + Duration::microseconds(MICROS_PER_TWO_YEARS)).timestamp(),
             issued_at: Utc::now().timestamp(),
             licenses: claims,
         }
