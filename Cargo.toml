@@ -17,7 +17,7 @@ authors = [
 aws-config = "1.1.7"
 aws-sdk-lambda = "1.15.1"
 aws-smithy-runtime-api = "1.1.7"
-aws-smithy-types = "1.1.7"
+aws-smithy-types = "1.1.8"
 chrono = { version = "0.4.35", default-features = false, features = ["clock", "serde"] }
 futures = "0.3.30"
 hmac = "0.12.1"
